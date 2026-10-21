@@ -56,19 +56,6 @@ python main.py
 python main.py --input data/mahasiswa_baru.csv --output data/hasil.csv --top 20
 ```
 
-## Deploy ke Streamlit Community Cloud
 
-1. Push proyek ke repository GitHub publik. Pastikan `app.py`, `requirements.txt`, `model/`, dan `data/students_performance.csv` ikut ter-commit.
-2. Buka <https://share.streamlit.io> dan login dengan akun GitHub.
-3. Klik **Create app**, pilih repository dan branch, lalu isi **Main file path** dengan `app.py`.
-4. Klik **Deploy**.
+Link prototype: [Prototype](https://studentsperformance-qwerty.streamlit.app/)
 
-Link prototype: _isi setelah deploy_
-
-## Pemecahan masalah
-
-| Masalah | Solusi |
-|---|---|
-| `FileNotFoundError: model/...` | Jalankan dari root proyek, bukan dari folder lain |
-| Model gagal dimuat | Samakan versi scikit-learn dengan `requirements.txt` (`1.9.1`) |
-| `source .venv/bin/activate` gagal di WSL | `.venv` dibuat di Windows. Buat venv baru di WSL atau jalankan dari PowerShell |

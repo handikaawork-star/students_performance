@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS students (
+    student_id          INTEGER PRIMARY KEY,
+    status              TEXT NOT NULL,
+    is_dropout          SMALLINT NOT NULL,
+    program_studi       TEXT,
+    usia_daftar         INTEGER,
+    kelompok_usia       TEXT,
+    jenis_kelamin       TEXT,
+    kelas               TEXT,
+    uang_kuliah         TEXT,
+    debitur             TEXT,
+    beasiswa            TEXT,
+    mk_diambil_sem1     INTEGER,
+    mk_lulus_sem1       INTEGER,
+    nilai_sem1          NUMERIC(6, 3),
+    mk_lulus_sem2       INTEGER,
+    nilai_sem2          NUMERIC(6, 3),
+    tingkat_lulus_sem1  NUMERIC(5, 3),
+    nilai_sem1_kosong   TEXT,
+    skor_risiko         NUMERIC(5, 4),
+    level_risiko        TEXT
+);

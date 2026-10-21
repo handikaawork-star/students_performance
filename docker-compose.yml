@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: student-postgres
+    environment:
+      POSTGRES_USER: student_user
+      POSTGRES_PASSWORD: student_password
+      POSTGRES_DB: student_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./sql/load_data.sql:/docker-entrypoint-initdb.d/02_load_data.sql:ro
+      - ./data:/data:ro
+
+  metabase:
+    image: metabase/metabase:v0.63.14.2
+    container_name: student-metabase
+    user: root
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_FILE: /metabase.db/metabase.db
+    # salin dashboard bawaan (metabase.db.mv.db) ke volume saat pertama kali dijalankan
+    entrypoint:
+      - /bin/sh
+      - -c
+      - '[ -f /metabase.db/metabase.db.mv.db ] || cp /seed/metabase.db.mv.db /metabase.db/; exec /app/run_metabase.sh'
+    volumes:
+      - metabasedb:/metabase.db
+      - ./metabase.db.mv.db:/seed/metabase.db.mv.db:ro
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
+  metabasedb:
