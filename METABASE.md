@@ -66,7 +66,7 @@ Semua kartu bisa difilter dengan **Program studi** dan **Jenis kelamin**.
 ## Cara membaca
 
 - **Dropout rate** dihitung terhadap seluruh mahasiswa, termasuk `Enrolled` yang statusnya belum final.
-- **Level risiko** berasal dari model prediksi (Logistic Regression, data pendaftaran + semester 1). Skor >= 0,5 Tinggi, 0,3 sampai < 0,5 Sedang, selainnya Rendah. Untuk data ini skor dihitung pada data yang sama dengan data latih, sehingga dipakai untuk memprioritaskan pendampingan, bukan mengukur akurasi.
+- **Level risiko** berasal dari model prediksi (Logistic Regression, data pendaftaran + semester 1). Skor >= 0,5 Tinggi, 0,3 sampai < 0,5 Sedang, selainnya Rendah. Model dilatih hanya pada mahasiswa Dropout dan Graduate; mahasiswa Enrolled tidak ikut training dan skornya adalah prediksi. Skor Dropout dan Graduate dihitung pada data yang sama dengan data latih, sehingga dipakai untuk memprioritaskan pendampingan, bukan mengukur akurasi.
 - Program studi dengan kurang dari 30 mahasiswa tidak ditampilkan karena angkanya tidak stabil.
 
 ## Temuan utama
@@ -76,4 +76,4 @@ Semua kartu bisa difilter dengan **Program studi** dan **Jenis kelamin**.
 - Nilai semester 1 kosong: 79,4% dropout (ada nilai: 23,0%).
 - Dropout naik tajam setelah usia 22 tahun, mencapai 59,8% pada usia 26-30 tahun.
 - Dropout tertinggi: Equinculture (55%), Informatics Eng. (54%), Management malam (51%).
-- 225 mahasiswa aktif berisiko tinggi dan layak didampingi lebih dulu.
+- 420 mahasiswa aktif (Enrolled) berisiko tinggi dan layak didampingi lebih dulu.

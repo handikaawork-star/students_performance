@@ -69,8 +69,9 @@ cols = list(model.named_steps["preprocess"].feature_names_in_)
 
 st.title("🎓 Prediksi Risiko Dropout Mahasiswa")
 st.caption(
-    "Prototype untuk Jaya Jaya Institut. Model: Logistic Regression, memakai data pendaftaran dan "
-    "semester 1, sehingga dapat dipakai begitu semester 1 selesai."
+    "Prototype untuk Jaya Jaya Institut. Model: Logistic Regression yang dilatih pada mahasiswa berstatus "
+    "Dropout (1) dan Graduate (0), memakai data pendaftaran dan semester 1, sehingga dapat dipakai begitu "
+    "semester 1 selesai. Mahasiswa Enrolled tidak dipakai untuk melatih model, melainkan menjadi sasaran prediksi."
 )
 
 tab_single, tab_batch = st.tabs(["Satu mahasiswa", "Banyak mahasiswa (CSV)"])
@@ -142,11 +143,19 @@ with tab_single:
 with tab_batch:
     st.write(
         "Unggah CSV data mahasiswa (pemisah `;`, kolom sama seperti `data/students_performance.csv`). "
-        "Kolom semester 2 dan `Status` boleh ada, akan diabaikan."
+        "Kolom semester 2 dan `Status` boleh ada, akan diabaikan oleh model."
     )
     up = st.file_uploader("File CSV", type="csv")
+    if st.button("Atau coba dengan mahasiswa Enrolled dari dataset"):
+        st.session_state["use_enrolled"] = True
     if up:
-        data = pd.read_csv(up, sep=";")
+        st.session_state["use_enrolled"] = False
+    if up or st.session_state.get("use_enrolled"):
+        if up:
+            data = pd.read_csv(up, sep=";")
+        else:
+            data = pd.read_csv(DATA_PATH, sep=";").query("Status == 'Enrolled'").reset_index(drop=True)
+            st.caption(f"Menampilkan prediksi untuk {len(data)} mahasiswa berstatus Enrolled.")
         data = add_derived_features(data)
         missing = [c for c in cols if c not in data.columns]
         if missing:
@@ -167,4 +176,7 @@ with tab_batch:
                                "hasil_prediksi.csv", "text/csv")
 
 st.divider()
-st.caption("Skor dipakai untuk mengurutkan prioritas pendampingan, bukan probabilitas sebenarnya.")
+st.caption(
+    "Skor dipakai untuk mengurutkan prioritas pendampingan, bukan probabilitas sebenarnya. "
+    "Skor tinggi berarti pola mahasiswa mirip mahasiswa yang dropout, bukan kepastian akan dropout."
+)

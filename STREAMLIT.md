@@ -1,6 +1,6 @@
 # Menjalankan Prototype Streamlit
 
-Prototype prediksi risiko dropout mahasiswa Jaya Jaya Institut ada di `app.py`.
+Prototype prediksi risiko dropout mahasiswa Jaya Jaya Institut ada di `app.py`. Model dilatih hanya pada mahasiswa Dropout (1) dan Graduate (0); mahasiswa Enrolled menjadi sasaran prediksi.
 
 ## Prasyarat
 
@@ -39,6 +39,8 @@ Browser terbuka otomatis di <http://localhost:8501>. Jika tidak terbuka, buka al
 2. Lihat jumlah mahasiswa per level risiko dan tabel yang diurutkan dari risiko tertinggi.
 3. Unduh hasilnya sebagai CSV.
 
+Tombol **Atau coba dengan mahasiswa Enrolled dari dataset** menjalankan prediksi pada 794 mahasiswa Enrolled, yaitu data yang tidak dipakai saat training.
+
 ## Level risiko
 
 | Skor | Level |
@@ -48,14 +50,6 @@ Browser terbuka otomatis di <http://localhost:8501>. Jika tidak terbuka, buka al
 | < 0,3 | Rendah |
 
 Skor dipakai untuk mengurutkan prioritas pendampingan, bukan probabilitas sebenarnya.
-
-## Prediksi lewat command line (opsional)
-
-```bash
-python main.py
-python main.py --input data/mahasiswa_baru.csv --output data/hasil.csv --top 20
-```
-
 
 Link prototype: [Prototype](https://studentsperformance-qwerty.streamlit.app/)
 

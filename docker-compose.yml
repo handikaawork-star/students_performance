@@ -22,7 +22,6 @@ services:
       - "3000:3000"
     environment:
       MB_DB_FILE: /metabase.db/metabase.db
-    # salin dashboard bawaan (metabase.db.mv.db) ke volume saat pertama kali dijalankan
     entrypoint:
       - /bin/sh
       - -c
