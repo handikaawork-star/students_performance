@@ -14,6 +14,8 @@ Dashboard **Monitoring Dropout Mahasiswa - Jaya Jaya Institut** membantu institu
 
 Prasyarat: Docker dan Docker Compose.
 
+**Versi Metabase:** `metabase/metabase:latest` (versi stable terbaru, diatur di `docker-compose.yml`). `metabase.db.mv.db` dibuat dengan Metabase v0.63.14.2, jadi gunakan versi tersebut atau yang lebih baru. Metabase versi lebih lama (misalnya v0.46.4) tidak dapat membuka berkas ini. Bila dashboard tidak termuat pada versi terbaru, ganti `latest` dengan `v0.63.14.2` di `docker-compose.yml`.
+
 ```bash
 docker compose up -d
 ```
@@ -41,7 +43,7 @@ docker compose up -d
 
 ```bash
 docker compose stop metabase
-docker cp student-metabase:/metabase.db/metabase.db/metabase.db.mv.db ./
+docker cp student-metabase:/metabase.db/metabase.db.mv.db ./
 docker compose start metabase
 ```
 

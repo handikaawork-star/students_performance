@@ -25,7 +25,7 @@ Di luar cakupan: menentukan penyebab sebab-akibat dropout, dan memakai informasi
 
 ### Persiapan
 
-**Sumber data:** dataset *Predict Students' Dropout and Academic Success* (UCI Machine Learning Repository), <https://archive.ics.uci.edu/dataset/697/predict+students+dropout+and+academic+success> (DOI: <https://doi.org/10.24432/C5MC89>). Salinan yang dipakai proyek ini ada di `data/students_performance.csv` (pemisah `;`), dan deskripsi kolomnya di `data/README.md`. Data berisi 4.424 mahasiswa dengan 36 fitur (demografi, ekonomi, jalur pendaftaran, dan kinerja semester 1-2) serta target `Status` (Dropout, Enrolled, Graduate). Tidak ada missing value maupun baris duplikat.
+**Sumber data:** Salinan yang dipakai proyek ini ada di `data/students_performance.csv` (pemisah `;`), dan deskripsi kolomnya di `data/README.md`. Data berisi 4.424 mahasiswa dengan 36 fitur (demografi, ekonomi, jalur pendaftaran, dan kinerja semester 1-2) serta target `Status` (Dropout, Enrolled, Graduate). Tidak ada missing value maupun baris duplikat.
 
 **Setup environment:**
 
@@ -68,7 +68,7 @@ Dashboard **Monitoring Dropout Mahasiswa - Jaya Jaya Institut** dibuat dengan Me
 
 Semua visual dapat difilter berdasarkan program studi dan jenis kelamin.
 
-**Versi Metabase:** `metabase/metabase:v0.63.14.2` (versi yang sama dengan pembuatan `metabase.db.mv.db`; gunakan versi ini atau yang lebih baru, karena Metabase versi lebih lama tidak dapat membuka database internal buatan versi lebih baru). Prasyarat: Docker.
+**Versi Metabase:** `metabase/metabase:latest` (versi stable terbaru). `metabase.db.mv.db` dibuat dengan Metabase v0.63.14.2, sehingga gunakan versi tersebut atau yang lebih baru; Metabase versi lebih lama tidak dapat membuka database internal buatan versi lebih baru. Bila hasil berbeda, pin ke `metabase/metabase:v0.63.14.2`. Prasyarat: Docker.
 
 ### Cara 1: Docker Compose (disarankan)
 
@@ -100,7 +100,7 @@ docker volume create metabasedb
 docker create --name student-metabase --network student-net --user root -p 3000:3000 \
   -e MB_DB_FILE=/metabase.db/metabase.db \
   -v metabasedb:/metabase.db \
-  metabase/metabase:v0.63.14.2
+  metabase/metabase:latest
 docker cp metabase.db.mv.db student-metabase:/metabase.db/metabase.db.mv.db
 
 # 3. Jalankan Metabase
