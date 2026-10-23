@@ -23,6 +23,9 @@ COURSES = {
     9991: "Management (malam)",
 }
 
+MARITAL = {1: "Lajang", 2: "Menikah", 3: "Duda/Janda (pasangan meninggal)", 4: "Bercerai",
+           5: "Kumpul kebo (facto union)", 6: "Berpisah secara hukum"}
+
 st.set_page_config(page_title="Prediksi Dropout - Jaya Jaya Institut", page_icon="🎓", layout="wide")
 
 
@@ -35,15 +38,26 @@ def load_model():
 
 
 @st.cache_data
-def load_defaults():
-    """Nilai tipikal (median) tiap fitur, dipakai untuk kolom yang tidak ditanyakan di form."""
-    df = pd.read_csv(DATA_PATH, sep=";")
-    return df.median(numeric_only=True).to_dict()
+def load_reference():
+    """Data acuan hanya untuk pilihan dan nilai awal isian form; tidak dipakai untuk mengisi fitur secara diam-diam."""
+    return pd.read_csv(DATA_PATH, sep=";")
 
 
 def add_derived_features(df):
     enrolled = df["Curricular_units_1st_sem_enrolled"].replace(0, np.nan)
     return df.assign(approval_rate_1st_sem=(df["Curricular_units_1st_sem_approved"] / enrolled).fillna(0))
+
+
+def code_select(label, col, help_text="Kode sesuai data/README.md"):
+    """Pilihan kode kategori yang ada di dataset; kosong sampai pengguna memilih."""
+    return st.selectbox(label, sorted(ref[col].unique().tolist()), index=None, placeholder="Pilih", help=help_text)
+
+
+def number(label, col, **kw):
+    """Isian angka dengan rentang dari dataset; kosong sampai pengguna mengisi."""
+    lo, hi = ref[col].min(), ref[col].max()
+    cast = int if pd.api.types.is_integer_dtype(ref[col]) else float
+    return st.number_input(label, cast(lo), cast(hi), value=None, placeholder="Isi", **kw)
 
 
 def risk_level(score):
@@ -64,7 +78,7 @@ def explain(model, means, row):
 
 
 model, means = load_model()
-defaults = load_defaults()
+ref = load_reference()
 cols = list(model.named_steps["preprocess"].feature_names_in_)
 
 st.title("🎓 Prediksi Risiko Dropout Mahasiswa")
@@ -77,46 +91,83 @@ st.caption(
 tab_single, tab_batch = st.tabs(["Satu mahasiswa", "Banyak mahasiswa (CSV)"])
 
 with tab_single:
+    st.caption("Isi semua kolom dengan data aktual mahasiswa. Seluruh fitur yang dipakai model berasal dari form ini, "
+               "tanpa nilai pengganti otomatis.")
     with st.form("form"):
         c1, c2, c3 = st.columns(3)
         with c1:
             st.subheader("Profil")
-            course = st.selectbox("Program studi", list(COURSES), index=list(COURSES).index(9500),
+            course = st.selectbox("Program studi", list(COURSES), index=None, placeholder="Pilih",
                                   format_func=COURSES.get)
-            age = st.number_input("Usia saat mendaftar", 17, 70, 20)
-            gender = st.radio("Jenis kelamin", [0, 1], format_func=lambda x: "Laki-laki" if x else "Perempuan",
-                              horizontal=True)
-            evening = st.radio("Kelas", [1, 0], format_func=lambda x: "Siang" if x else "Malam", horizontal=True)
+            age = st.number_input("Usia saat mendaftar", 17, 70, value=None, placeholder="Isi")
+            gender = st.radio("Jenis kelamin", [0, 1], index=None,
+                              format_func=lambda x: "Laki-laki" if x else "Perempuan", horizontal=True)
+            marital = st.selectbox("Status pernikahan", list(MARITAL), index=None, placeholder="Pilih",
+                                   format_func=MARITAL.get)
+            nationality = code_select("Kewarganegaraan (kode)", "Nacionality")
+            international = st.checkbox("Mahasiswa internasional")
+            special_needs = st.checkbox("Berkebutuhan pendidikan khusus")
             displaced = st.checkbox("Perantau (pindah dari daerah asal)")
-            admission = st.number_input("Nilai masuk (0-200)", 0.0, 200.0, float(defaults["Admission_grade"]))
+            evening = st.radio("Kelas", [1, 0], index=None,
+                               format_func=lambda x: "Siang" if x else "Malam", horizontal=True)
         with c2:
-            st.subheader("Keuangan")
-            fees = st.checkbox("Uang kuliah lunas tepat waktu", value=True)
+            st.subheader("Pendaftaran dan keluarga")
+            app_mode = code_select("Jalur pendaftaran (kode)", "Application_mode")
+            app_order = number("Urutan pilihan pendaftaran (0-9)", "Application_order")
+            prev_qual = code_select("Kualifikasi sebelumnya (kode)", "Previous_qualification")
+            prev_grade = number("Nilai kualifikasi sebelumnya (0-200)", "Previous_qualification_grade")
+            admission = number("Nilai masuk (0-200)", "Admission_grade")
+            mother_qual = code_select("Pendidikan ibu (kode)", "Mothers_qualification")
+            father_qual = code_select("Pendidikan ayah (kode)", "Fathers_qualification")
+            mother_occ = code_select("Pekerjaan ibu (kode)", "Mothers_occupation")
+            father_occ = code_select("Pekerjaan ayah (kode)", "Fathers_occupation")
+        with c3:
+            st.subheader("Keuangan dan semester 1")
+            fees = st.checkbox("Uang kuliah lunas tepat waktu")
             debtor = st.checkbox("Tercatat sebagai debitur")
             scholarship = st.checkbox("Penerima beasiswa")
-        with c3:
-            st.subheader("Semester 1")
-            enrolled = st.number_input("Mata kuliah diambil", 0, 30, 6)
-            approved = st.number_input("Mata kuliah lulus", 0, 30, 5)
-            grade = st.number_input("Rata-rata nilai (0-20, isi 0 jika belum ada)", 0.0, 20.0, 12.0)
-            evals = st.number_input("Jumlah evaluasi/ujian", 0, 50, 8)
+            credited = number("Mata kuliah diakui (credited)", "Curricular_units_1st_sem_credited")
+            enrolled = number("Mata kuliah diambil", "Curricular_units_1st_sem_enrolled")
+            approved = number("Mata kuliah lulus", "Curricular_units_1st_sem_approved")
+            grade = number("Rata-rata nilai (0-20, isi 0 jika belum ada)", "Curricular_units_1st_sem_grade")
+            evals = number("Jumlah evaluasi/ujian", "Curricular_units_1st_sem_evaluations")
+            no_evals = number("Mata kuliah tanpa evaluasi", "Curricular_units_1st_sem_without_evaluations")
+        st.subheader("Kondisi makro saat mendaftar")
+        m1c, m2c, m3c = st.columns(3)
+        with m1c:
+            unemployment = number("Tingkat pengangguran (%)", "Unemployment_rate")
+        with m2c:
+            inflation = number("Tingkat inflasi (%)", "Inflation_rate")
+        with m3c:
+            gdp = number("GDP (pertumbuhan, %)", "GDP")
         submitted = st.form_submit_button("Prediksi", type="primary")
 
     if submitted:
-        if approved > enrolled:
+        row = {
+            "Marital_status": marital, "Application_mode": app_mode, "Application_order": app_order,
+            "Course": course, "Daytime_evening_attendance": evening,
+            "Previous_qualification": prev_qual, "Previous_qualification_grade": prev_grade,
+            "Nacionality": nationality, "Mothers_qualification": mother_qual,
+            "Fathers_qualification": father_qual, "Mothers_occupation": mother_occ,
+            "Fathers_occupation": father_occ, "Admission_grade": admission,
+            "Displaced": int(displaced), "Educational_special_needs": int(special_needs),
+            "Debtor": int(debtor), "Tuition_fees_up_to_date": int(fees), "Gender": gender,
+            "Scholarship_holder": int(scholarship), "Age_at_enrollment": age,
+            "International": int(international),
+            "Curricular_units_1st_sem_credited": credited,
+            "Curricular_units_1st_sem_enrolled": enrolled,
+            "Curricular_units_1st_sem_evaluations": evals,
+            "Curricular_units_1st_sem_approved": approved,
+            "Curricular_units_1st_sem_grade": grade,
+            "Curricular_units_1st_sem_without_evaluations": no_evals,
+            "Unemployment_rate": unemployment, "Inflation_rate": inflation, "GDP": gdp,
+        }
+        empty = [k for k, v in row.items() if v is None]
+        if empty:
+            st.error(f"Lengkapi semua kolom sebelum memprediksi. Belum diisi: {', '.join(empty)}")
+        elif approved > enrolled:
             st.error("Mata kuliah lulus tidak boleh lebih besar dari mata kuliah diambil.")
         else:
-            row = {c: defaults.get(c, 0) for c in cols}
-            row.update({
-                "Course": course, "Age_at_enrollment": age, "Gender": gender,
-                "Daytime_evening_attendance": evening, "Displaced": int(displaced),
-                "Admission_grade": admission, "Tuition_fees_up_to_date": int(fees),
-                "Debtor": int(debtor), "Scholarship_holder": int(scholarship),
-                "Curricular_units_1st_sem_enrolled": enrolled,
-                "Curricular_units_1st_sem_approved": approved,
-                "Curricular_units_1st_sem_grade": grade,
-                "Curricular_units_1st_sem_evaluations": evals,
-            })
             X = add_derived_features(pd.DataFrame([row]))[cols]
             score = float(model.predict_proba(X)[0, 1])
             level = risk_level(score)
@@ -138,7 +189,6 @@ with tab_single:
             top = top[top.abs() > 0.01]
             st.bar_chart(pd.DataFrame({"pengaruh": top}).assign(
                 color=np.where(top > 0, "#e76f51", "#2a9d8f")), y="pengaruh", color="color", horizontal=True)
-            st.caption("Kolom yang tidak ada di form diisi nilai median data latih.")
 
 with tab_batch:
     st.write(

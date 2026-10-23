@@ -68,7 +68,7 @@ Dashboard **Monitoring Dropout Mahasiswa - Jaya Jaya Institut** dibuat dengan Me
 
 Semua visual dapat difilter berdasarkan program studi dan jenis kelamin.
 
-**Versi Metabase:** `metabase/metabase:latest` (versi stable terbaru). `metabase.db.mv.db` dibuat dengan Metabase v0.63.14.2, sehingga gunakan versi tersebut atau yang lebih baru; Metabase versi lebih lama tidak dapat membuka database internal buatan versi lebih baru. Bila hasil berbeda, pin ke `metabase/metabase:v0.63.14.2`. Prasyarat: Docker.
+**Versi Metabase:** `metabase/metabase:latest` (versi yang sama dengan pembuatan `metabase.db.mv.db`; gunakan versi ini atau yang lebih baru, karena Metabase versi lebih lama tidak dapat membuka database internal buatan versi lebih baru). Prasyarat: Docker.
 
 ### Cara 1: Docker Compose (disarankan)
 

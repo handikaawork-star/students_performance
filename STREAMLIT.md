@@ -30,7 +30,7 @@ Browser terbuka otomatis di <http://localhost:8501>. Jika tidak terbuka, buka al
 ## Cara memakai
 
 **Tab "Satu mahasiswa"**
-1. Isi form: profil, keuangan, dan hasil semester 1.
+1. Isi form lengkap: profil, data pendaftaran dan keluarga, keuangan, hasil semester 1, dan kondisi makro. Semua kolom wajib diisi dengan data aktual mahasiswa; tidak ada nilai awal maupun nilai pengganti (median), dan prediksi tidak jalan bila ada yang kosong.
 2. Klik **Prediksi**.
 3. Aplikasi menampilkan skor risiko, level risiko (Tinggi, Sedang, Rendah), saran tindakan, dan faktor yang memengaruhi skor.
 
